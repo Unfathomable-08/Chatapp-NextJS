@@ -16,7 +16,7 @@ const Login = () => {
       const res = await axios.post("https://zyvelo.vercel.app/api/login", data);
       if (res.status === 200) {
         localStorage.setItem("token", res.data.token);
-        router.push("/dashboard"); // Redirect after successful login
+        router.push("/");
       }
     } catch (error) {
       setError("email", { type: "manual", message: "Invalid email or password" });

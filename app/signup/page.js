@@ -23,7 +23,7 @@ const Signup = () => {
             const res = await axios.post("/api/signup", formData);
             if (res.status === 201) {
               localStorage.setItem("token", res.data.token);
-              router.push("/login");
+              router.push("/");
             }
           } catch (error) {
             alert("An error occurred while sending data!");

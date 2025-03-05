@@ -1,6 +1,23 @@
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css");
 @import "tailwindcss";
 
 @theme {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+.sent {
+  @apply self-end max-w-[50%];
+}
+
+.sent span {
+  @apply bg-blue-700 text-white py-1.5 rounded-2xl px-4 inline-block break-words;
+}
+
+.recieved {
+  @apply self-start max-w-[50%];
+}
+
+.recieved span {
+  @apply bg-gray-300 py-1.5 rounded-2xl px-4 inline-block break-words;
 }
