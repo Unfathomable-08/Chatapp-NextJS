@@ -21,3 +21,11 @@
 .recieved span {
   @apply bg-gray-300 py-1.5 rounded-2xl px-4 inline-block break-words;
 }
+
+.rooms {
+  scrollbar-width: none;
+}
+
+.rooms::-webkit-scrollbar {
+  display: none;
+}
