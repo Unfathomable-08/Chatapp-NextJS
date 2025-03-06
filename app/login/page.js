@@ -6,8 +6,11 @@ import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { useUserContext } from "@/Context";
 
 const Login = () => {
+  const [, setUserData] = useUserContext();
+
   const router = useRouter();
   const [formData, setFormData] = useState("");
   const { register, handleSubmit, setError, formState: { errors, isSubmitting } } = useForm();
@@ -16,10 +19,16 @@ const Login = () => {
     try {
       const res = await axios.post("/api/login", data);
       if (res.status === 200) {
+        setUserData({
+          name: res.data.data.first_name + res.data.data.last_name,
+          email: res.data.data.email,
+          username: res.data.data.username
+        });
         localStorage.setItem("token", res.data.token);
         router.push("/");
       }
     } catch (error) {
+      console.log(error)
       setError("email", { type: "manual", message: "Invalid email or password" });
       toast.error(error.response?.data?.message, {
         position: "top-right",

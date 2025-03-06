@@ -6,8 +6,10 @@ import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { useUserContext } from "@/Context";
 
 const Signup = () => {
+  const [, setUserData] = useUserContext();
   const router = useRouter();
   const [formData, setFormData] = useState("");
   const { register, handleSubmit, setError, formState: { errors, isSubmitting } } = useForm();
@@ -23,6 +25,11 @@ const Signup = () => {
           try {
             const res = await axios.post("/api/signup", formData);
             if (res.status === 201) {
+              setUserData({
+                name: res.data.data.first_name + res.data.data.last_name,
+                email: res.data.data.email,
+                username: res.data.data.username
+              });
               localStorage.setItem("token", res.data.token);
               router.push("/");
             }

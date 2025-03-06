@@ -1,40 +1,73 @@
 "use client"
 import Modal from "@/components/Modal";
+import { useUserContext } from "@/Context";
 import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 export default function Home() {
   const router = useRouter();
+  const [userData, setUserData] = useUserContext();
   const [showModal, setShowModal] = useState(false);
+  const [rooms, setRooms] = useState([]);
 
-  useEffect(()=>{
+  useEffect(() => {
     // Protect Route
     const fetchFn = async () => {
       try {
         const token = localStorage.getItem("token");
+        
         const res = await axios.get("/api", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+
         if (res.status !== 200) {
           router.push("/login");
         }
+
+        setUserData({
+          name: res.data.data.first_name + res.data.data.last_name,
+          email: res.data.data.email,
+          username: res.data.data.username
+        });
+
       } catch (error) {
         console.log(error);
         router.push("/login");
 
       }
     };
-
     fetchFn();
 
     // Bottom Of Chat
     window.scrollTo(0, document.body.scrollHeight);
-  },[]);
-  
+  }, []);
+
+  // Fetching Rooms
+  useEffect(() => {
+    try {
+      const fetchFn = async() => {
+        const res = await axios.get(`/api/rooms?username=${userData.username}`);
+        setRooms(res.data);
+      }
+      fetchFn();
+
+    } catch (error) {
+      toast.error(error.response?.data?.message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  }, [])
+
   const createRoom = () => {
     window.scrollTo(0, document.body.scrollHeight);
     setShowModal(prev => !prev);
@@ -53,56 +86,18 @@ export default function Home() {
         <div className="ps-16 w-full">
           <div className="bg-[#3f5370] h-screen w-80 fixed left-16 py-10 px-4 text-white overflow-y-auto rooms">
             <div className="grid grid-cols-[9fr_1fr] justify-center items-center gap-4">
-              <input type="search" placeholder="Search Room" className="bg-[#283e5e] rounded-3xl w-full px-6 py-1 text-white placeholder-white placeholder:font-light"/>
+              <input type="search" placeholder="Search Room" className="bg-[#283e5e] rounded-3xl w-full px-6 py-1 text-white placeholder-white placeholder:font-light" />
               <button onClick={createRoom} className="text-4xl font-light transform -translate-[5px] cursor-pointer">+</button>
             </div>
             <div className="py-8 ps-4 pe-2">
               <ul className="flex flex-col gap-y-6">
-                <li className="relative">
-                  <h4 className="font-bold">Room ABC 1</h4>
-                  <p className="text-gray-300">Room 1 description anything</p>
+              { rooms.map((room, index)=>
+                <li key={index} className="relative">
+                  <h4 className="font-bold">{ room.name }</h4>
+                  <p className="text-gray-300">{ room.description }</p>
                   <span className="absolute right-0 top-3 bg-[#112d4e] py-1 px-2.5 rounded-full text-sm">2</span>
                 </li>
-                <li className="relative">
-                  <h4 className="font-bold">Room ABC 1</h4>
-                  <p className="text-gray-300">Room 1 description anything</p>
-                  <span className="absolute right-0 top-3 bg-[#112d4e] py-1 px-2.5 rounded-full text-sm">2</span>
-                </li>
-                <li className="relative">
-                  <h4 className="font-bold">Room ABC 1</h4>
-                  <p className="text-gray-300">Room 1 description anything</p>
-                  <span className="absolute right-0 top-3 bg-[#112d4e] py-1 px-2.5 rounded-full text-sm">2</span>
-                </li>
-                <li className="relative">
-                  <h4 className="font-bold">Room ABC 1</h4>
-                  <p className="text-gray-300">Room 1 description anything</p>
-                  <span className="absolute right-0 top-3 bg-[#112d4e] py-1 px-2.5 rounded-full text-sm">2</span>
-                </li>
-                <li className="relative">
-                  <h4 className="font-bold">Room ABC 1</h4>
-                  <p className="text-gray-300">Room 1 description anything</p>
-                  <span className="absolute right-0 top-3 bg-[#112d4e] py-1 px-2.5 rounded-full text-sm">2</span>
-                </li>
-                <li className="relative">
-                  <h4 className="font-bold">Room ABC 1</h4>
-                  <p className="text-gray-300">Room 1 description anything</p>
-                  <span className="absolute right-0 top-3 bg-[#112d4e] py-1 px-2.5 rounded-full text-sm">2</span>
-                </li>
-                <li className="relative">
-                  <h4 className="font-bold">Room ABC 1</h4>
-                  <p className="text-gray-300">Room 1 description anything</p>
-                  <span className="absolute right-0 top-3 bg-[#112d4e] py-1 px-2.5 rounded-full text-sm">2</span>
-                </li>
-                <li className="relative">
-                  <h4 className="font-bold">Room ABC 1</h4>
-                  <p className="text-gray-300">Room 1 description anything</p>
-                  <span className="absolute right-0 top-3 bg-[#112d4e] py-1 px-2.5 rounded-full text-sm">2</span>
-                </li>
-                <li className="relative">
-                  <h4 className="font-bold">Room ABC 1</h4>
-                  <p className="text-gray-300">Room 1 description anything</p>
-                  <span className="absolute right-0 top-3 bg-[#112d4e] py-1 px-2.5 rounded-full text-sm">2</span>
-                </li>
+              )}
               </ul>
             </div>
           </div>
@@ -110,7 +105,7 @@ export default function Home() {
           <div className="bg-[#eeeeee] min-h-screen relative px-8 pb-8 ml-80">
             <div>
               <div className="flex items-center gap-x-8 pt-6 fixed bg-[#eeeeee] w-full ">
-                <Image alt="" className="bg-black w-[45px] h-[45px] rounded-full p-2"/>
+                <Image alt="" className="bg-black w-[45px] h-[45px] rounded-full p-2" />
                 <div>
                   <h4 className="text-xl font-bold text-[#0a192f]">Room ABC 1</h4>
                   <p className="text-gray-900">Room 1 description anything</p>
@@ -149,7 +144,7 @@ export default function Home() {
                 <p className="recieved"><span>you dont know too i think you would know what you think dont tell me you think too about it now stop talking okay ended.</span></p>
               </div>
             </div>
-            <form style={{width: "calc(100vw - 128px - 320px)"}} className=" fixed bottom-0 bg-[#eeeeee] pb-8 pt-4">
+            <form style={{ width: "calc(100vw - 128px - 320px)" }} className=" fixed bottom-0 bg-[#eeeeee] pb-8 pt-4">
               <input type="text" placeholder="Message" className="w-full border-1 border-gray-600 px-8 py-2 rounded-3xl"></input>
               <button><i className="fa-solid fa-paper-plane text-xl text-[#112d4e] absolute right-0 transform -translate-y-4 -translate-x-6"></i></button>
             </form>
@@ -157,7 +152,7 @@ export default function Home() {
         </div>
       </div>
 
-      {showModal && <Modal onClose={createRoom}/>}
-    </>         
+      {showModal && <Modal onClose={createRoom} />}
+    </>
   );
 }

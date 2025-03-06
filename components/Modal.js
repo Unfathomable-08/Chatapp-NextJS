@@ -1,15 +1,19 @@
 "use client";
 
+import { useUserContext } from "@/Context";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 const Modal = ({ onClose }) => {
+  const [userData] = useUserContext();
+
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
 
   const submitFn = async (data) => {
     try {
       const res = await axios.post("/api/rooms", data);
+
       toast.success(res.data.message, {
         position: "top-right",
         autoClose: 3000,
@@ -19,8 +23,12 @@ const Modal = ({ onClose }) => {
         draggable: true,
         progress: undefined,
       });
+
       onClose();
+
     } catch (error) {
+      console.error(error);
+
       toast.error(error.response?.data?.message, {
         position: "top-right",
         autoClose: 3000,
@@ -29,7 +37,6 @@ const Modal = ({ onClose }) => {
         draggable: true,
         progress: undefined,
       });
-      console.error(error);
     }
   }
 
@@ -38,6 +45,23 @@ const Modal = ({ onClose }) => {
       <div className="bg-[#fefefe] p-8 rounded-2xl shadow-[0_0_20px_black] w-[500px]">
         <h1 className="text-2xl font-semibold mb-6 text-center">Create Room</h1>
         <form onSubmit={handleSubmit(submitFn)}>
+
+          {/* Hidden Input */}
+            <input
+              type="text"
+              hidden
+              value={userData.username}
+              {...register("owner", { required: "Owner is required!" })}
+            />
+            <input
+              type="text"
+              hidden
+              value={[userData.username]}
+              {...register("members", { required: "Room name is required!" })}
+            />
+
+          {/* Part Of Form */}
+
           <div className={errors.name ? "mb-0" : "mb-6"}>
             <label className="block text-md font-medium mb-1">Unique Name</label>
             <input
