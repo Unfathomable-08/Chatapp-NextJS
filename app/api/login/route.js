@@ -38,6 +38,6 @@ export async function POST(req) {
         return Response.json({message: "Login Succesful", data: user[0], token: token}, {status: 200});
 
     } catch (error) {
-        return Response.json({ error: error.message }, { status: 500 })
+        return Response.json({ message: error.message }, { status: 500 })
     }
 }

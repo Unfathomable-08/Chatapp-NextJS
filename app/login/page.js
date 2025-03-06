@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const router = useRouter();
@@ -13,13 +14,21 @@ const Login = () => {
 
   const submitFn = async (data) => {
     try {
-      const res = await axios.post("https://zyvelo.vercel.app/api/login", data);
+      const res = await axios.post("/api/login", data);
       if (res.status === 200) {
         localStorage.setItem("token", res.data.token);
         router.push("/");
       }
     } catch (error) {
       setError("email", { type: "manual", message: "Invalid email or password" });
+      toast.error(error.response?.data?.message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     }
   };
 

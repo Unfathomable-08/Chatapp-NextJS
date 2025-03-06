@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const Signup = () => {
   const router = useRouter();
@@ -26,8 +27,14 @@ const Signup = () => {
               router.push("/");
             }
           } catch (error) {
-            alert("An error occurred while sending data!");
-            console.log(error);
+            toast.error(error.response?.data?.message, {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
           }
         } else {
           setError("rePassword", {
@@ -70,8 +77,8 @@ const Signup = () => {
               {...register("last_name", { required: "Last name is required" })}
               className="w-full border border-gray-400 p-2 rounded-xl"
             />
-          {errors.first_name && <p className="text-red-600 text-sm">{errors.first_name.message}</p>}
-          {errors.last_name && <p className="text-red-600 text-sm">{errors.last_name.message}</p>}
+            {errors.first_name && <p className="text-red-600 text-sm">{errors.first_name.message}</p>}
+            {errors.last_name && <p className="text-red-600 text-sm">{errors.last_name.message}</p>}
           </div>
 
           {/* Email */}
@@ -89,14 +96,14 @@ const Signup = () => {
           />
           {errors.email && <p className="text-red-600 text-sm">{errors.email.message}</p>}
 
-            {/* Username */}
-            <input
-              type="text"
-              placeholder="Username"
-              {...register("username", { required: "Username name is required" })}
-              className="w-full border border-gray-400 p-2 rounded-xl mt-4"
-            />
-            {errors.username && <p className="text-red-600 text-sm">{errors.username.message}</p>}
+          {/* Username */}
+          <input
+            type="text"
+            placeholder="Username"
+            {...register("username", { required: "Username name is required" })}
+            className="w-full border border-gray-400 p-2 rounded-xl mt-4"
+          />
+          {errors.username && <p className="text-red-600 text-sm">{errors.username.message}</p>}
           {/* Password */}
           <input
             type="password"

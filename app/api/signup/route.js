@@ -35,6 +35,6 @@ export async function POST(req){
         return Response.json({message: "Signup Succesful", data: user, token: token}, {status: 201});
     }
     catch (error){
-        return Response.json({error: error.message}, {status: 500});
+        return Response.json({message: error.message}, {status: 500});
     }
 }

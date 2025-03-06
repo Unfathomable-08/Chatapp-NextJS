@@ -1,16 +1,49 @@
 "use client"
+import Modal from "@/components/Modal";
+import axios from "axios";
 import Image from "next/image";
-import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const router = useRouter();
+  const [showModal, setShowModal] = useState(false);
+
   useEffect(()=>{
+    // Protect Route
+    const fetchFn = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get("/api", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (res.status !== 200) {
+          router.push("/login");
+        }
+      } catch (error) {
+        console.log(error);
+        router.push("/login");
+
+      }
+    };
+
+    fetchFn();
+
+    // Bottom Of Chat
     window.scrollTo(0, document.body.scrollHeight);
-  },[])
+  },[]);
+  
+  const createRoom = () => {
+    window.scrollTo(0, document.body.scrollHeight);
+    setShowModal(prev => !prev);
+  }
 
   return (
     <>
       <div className="flex">
-        <div className="sidebar-settings bg-[#0a192f] h-screen fixed w-16 z-10 flex flex-col items-center py-10 gap-y-12">
+        <div className="sidebar-settings bg-[#0e0f11] h-screen fixed w-16 z-10 flex flex-col items-center py-10 gap-y-12">
           <i className="fa-solid fa-comment-dots text-2xl  text-gray-50"></i>
           <i className="fa-solid fa-user text-2xl text-gray-500"></i>
           <i className="fa-solid fa-gear text-2xl text-gray-500"></i>
@@ -19,7 +52,10 @@ export default function Home() {
 
         <div className="ps-16 w-full">
           <div className="bg-[#3f5370] h-screen w-80 fixed left-16 py-10 px-4 text-white overflow-y-auto rooms">
-            <input type="search" placeholder="Search Room" className="bg-[#283e5e] rounded-3xl w-full px-6 py-1 text-white placeholder-white placeholder:font-light"/>
+            <div className="grid grid-cols-[9fr_1fr] justify-center items-center gap-4">
+              <input type="search" placeholder="Search Room" className="bg-[#283e5e] rounded-3xl w-full px-6 py-1 text-white placeholder-white placeholder:font-light"/>
+              <button onClick={createRoom} className="text-4xl font-light transform -translate-[5px] cursor-pointer">+</button>
+            </div>
             <div className="py-8 ps-4 pe-2">
               <ul className="flex flex-col gap-y-6">
                 <li className="relative">
@@ -73,7 +109,7 @@ export default function Home() {
 
           <div className="bg-[#eeeeee] min-h-screen relative px-8 pb-8 ml-80">
             <div>
-              <div className="flex items-center gap-x-8 pt-8 fixed bg-[#eeeeee] w-full ">
+              <div className="flex items-center gap-x-8 pt-6 fixed bg-[#eeeeee] w-full ">
                 <Image alt="" className="bg-black w-[45px] h-[45px] rounded-full p-2"/>
                 <div>
                   <h4 className="text-xl font-bold text-[#0a192f]">Room ABC 1</h4>
@@ -120,6 +156,8 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {showModal && <Modal onClose={createRoom}/>}
     </>         
   );
 }
