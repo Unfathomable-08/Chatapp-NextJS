@@ -67,7 +67,13 @@ const Modal = ({ onClose }) => {
             <input
               type="text"
               className="w-full px-3 py-2 border border-gray-800 rounded-lg focus:outline-none"
-              {...register("name", { required: "Room name is required!" })}
+              {...register("name", { 
+                required: "Room name is required!",
+                pattern: {
+                  value: /^[a-zA-Z0-9_-]+$/,
+                  message: "Only letters, numbers, underscores, and hyphens are allowed!",
+                }
+              })}
             />
             { errors.name && <p className="text-red-600">{ errors.name.message }</p> }
           </div>

@@ -19,6 +19,7 @@ export async function GET(req) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
   
       return Response.json({ user: decoded }, { status: 200 });
+      
     } catch (error) {
       return Response.json({ error: error.message }, { status: 500 });
     }
