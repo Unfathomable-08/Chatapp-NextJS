@@ -1,4 +1,5 @@
 "use client"
+
 import Modal from "@/components/Modal";
 import { useUserContext } from "@/Context";
 import axios from "axios";
@@ -6,6 +7,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp, onSnapshot, query, orderBy } from "firebase/firestore";
 
 export default function Home() {
   const router = useRouter();
@@ -14,7 +17,10 @@ export default function Home() {
   const [rooms, setRooms] = useState([]);
   const [focusedRoom, setFocusedRoom] = useState();
   const [search, setSearch] = useState("");
+  const [message, setMessage] = useState("");
+  const [allMsgs, setAllMsgs] = useState([]);
   const searchRef = useRef(null);
+  const messageRef = useRef(null);
 
   useEffect(() => {
     // Protect Route
@@ -74,6 +80,24 @@ export default function Home() {
     fetchRooms();
   }, [userData, showModal]);
 
+  // Fetching Messages
+  useEffect(()=>{
+    if(!focusedRoom?.name) return;
+
+    const q = query(
+      collection(db, `rooms/${focusedRoom.name}/messages`), 
+      orderBy("timestamp", "asc")
+    );    
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setAllMsgs(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+  
+    return () => unsubscribe();
+
+  },[focusedRoom])
+
+
   const logout = () => {
     localStorage.removeItem("token");
     router.push('/login');
@@ -107,6 +131,37 @@ export default function Home() {
       });
     }
   }
+
+  const sentMessage = async (e) => {
+    e.preventDefault(); 
+
+    if (!message.trim() || !focusedRoom) return;
+    console.log(focusedRoom.name)
+    try {
+      const docRef = await addDoc(collection(db, `rooms/${focusedRoom.name}/messages`), {
+        user: userData.username,
+        message,
+        timestamp: serverTimestamp(),
+      });
+      console.log(docRef)
+
+      setMessage("");
+      messageRef.current.value = "";
+
+    } catch (error) {
+      console.log(error);
+
+      toast.error(error.message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
+  };
+
 
   return (
     <>
@@ -157,11 +212,17 @@ export default function Home() {
                   <p className="sent"><span>you dont know too</span></p>
                   <p className="sent"><span>you dont know too</span></p>
                   <p className="recieved"><span>user 1 Message</span></p>
+                  {
+                    allMsgs.map((msg, index)=>
+                      <p key={index} className={msg.user === userData.username ? "sent" : "recieved"}><span>{ msg.message }</span></p>
+                    )
+                  }
                 </div>
               </div>
-              <form style={{ width: "calc(100vw - 128px - 320px)" }} className="fixed bottom-0 bg-[#eeeeee] pb-8 pt-4">
-                <input type="text" placeholder="Message" className="w-full border border-gray-600 px-8 py-2 rounded-3xl" />
-                <button>
+              <form style={{ width: "calc(100vw - 128px - 320px)" }} className="fixed bottom-0 bg-[#eeeeee] pb-8 pt-4" onSubmit={(e) => {sentMessage(e)}}
+            >
+                <input ref={messageRef} onChange={(e)=>{setMessage(e.target.value)}} type="text" placeholder="Message" className="w-full border border-gray-600 px-8 py-2 rounded-3xl" />
+                <button type="submit">
                   <i className="fa-solid fa-paper-plane text-xl text-[#112d4e] absolute right-0 transform -translate-y-4 -translate-x-6"></i>
                 </button>
               </form>
@@ -170,7 +231,7 @@ export default function Home() {
             <div className="bg-[#eeeeee] min-h-screen flex flex-col px-8 pb-8 ml-80 justify-center items-center text-center">
               <h2 className="text-2xl font-semibold text-gray-700">No Room Selected</h2>
               <p className="text-gray-600 mt-2">
-                Use the search bar to find a room then click the "<span className="text-xl">+</span>" button or just create a new one.
+                Use the search bar to find a room then click the <span className="text-xl">+</span> button or just create a new one.
               </p>
             </div>
           )}
