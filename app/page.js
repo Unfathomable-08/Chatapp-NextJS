@@ -241,6 +241,11 @@ export default function Home() {
       {/* Modal Component */}
       {showModal && <Modal onClose={createRoom} />}
       {searchModal && <SearchModal onClose={setSearchModal} room={search} />}
+
+      {/* Arrow for mobile */}
+      <div className="md:hidden">
+        <i></i>
+      </div>
     </>
   );  
 }
