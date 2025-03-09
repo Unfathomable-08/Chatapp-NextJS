@@ -21,6 +21,7 @@ export default function Home() {
   const [searchModal, setSearchModal] = useState(false);
   const [message, setMessage] = useState("");
   const [allMsgs, setAllMsgs] = useState([]);
+  const [sidebar, setSidebar] = useState(false);
   const searchRef = useRef(null);
   const messageRef = useRef(null);
 
@@ -172,14 +173,14 @@ export default function Home() {
     <>
       <div className="flex">
         <div className="sidebar-settings bg-[#0e0f11] h-screen fixed w-16 z-10 flex flex-col items-center py-10 gap-y-12 max-md:hidden">
-          <i className="fa-solid fa-comment-dots text-2xl  text-gray-50"></i>
+          <i className="fa-solid fa-comment-dots text-2xl  text-gray-50" onClick={()=>{setSidebar(prev => !prev)}}></i>
           <i className="fa-solid fa-user text-2xl text-gray-500"></i>
           <i className="fa-solid fa-gear text-2xl text-gray-500"></i>
           <i onClick={logout} className="fa-solid fa-right-from-bracket text-2xl text-gray-500 mt-auto"></i>
         </div>
   
         <div className="md:ps-16 w-full">
-          <div className="bg-[#3f5370] h-screen w-60 lg:w-80 fixed md:left-16 py-10 px-4 text-white overflow-y-auto rooms max-sm:hidden">
+          <div className={`bg-[#3f5370] h-screen w-60 lg:w-80 fixed md:left-16 py-10 px-4 text-white overflow-y-auto rooms ${sidebar ? "" : "hidden sm:block"}`}>
             <div className="grid grid-cols-[9fr_1fr] justify-center items-center gap-x-4 gap-y-1">
               <input type="search" placeholder="Search Room ..." ref={searchRef} onChange={(e)=>setSearch(e.target.value)} className="bg-[#eee] rounded-3xl w-full px-6 py-[3px] focus:outline-none focus:border-black focus:border-1 text-black placeholder-black placeholder:font-dark border-1 border-white" />
               <button onClick={searchRoom} className="text-4xl font-light transform -translate-[5px] cursor-pointer">+</button>
@@ -228,7 +229,7 @@ export default function Home() {
               </form>
             </div>
           ) : (
-            <div className="bg-[#eeeeee] min-h-screen flex flex-col px-8 pb-8 ml-80 justify-center items-center text-center">
+            <div className="bg-[#eeeeee] min-h-screen flex flex-col px-8 pb-8 lg:ml-80 sm:ml-60 justify-center items-center text-center">
               <h2 className="text-2xl font-semibold text-gray-700">No Room Selected</h2>
               <p className="text-gray-600 mt-2">
                 Use the search bar to find a room then click the <span className="text-xl">+</span> button or just create a new one.
@@ -243,8 +244,8 @@ export default function Home() {
       {searchModal && <SearchModal onClose={setSearchModal} room={search} />}
 
       {/* Arrow for mobile */}
-      <div className="md:hidden">
-        <i></i>
+      <div className="md:hidden fixed z-30 left-0 cursor-pointer top-1/2 transform -translate-y-1/2 text-2xl">
+        <i className={`fa-solid ${sidebar ? "fa-chevron-left" : "fa-chevron-right"} text-gray-900 ps-2`} onClick={()=>{setSidebar(prev => !prev)}}></i>
       </div>
     </>
   );  
