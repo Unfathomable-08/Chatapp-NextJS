@@ -7,7 +7,7 @@
 }
 
 .sent {
-  @apply self-end max-w-[50%];
+  @apply self-end max-w-[75%] md:max-w-[50%];
 }
 
 .sent span {
@@ -15,7 +15,7 @@
 }
 
 .recieved {
-  @apply self-start max-w-[50%];
+  @apply self-start max-w-[75%] md:max-w-[50%];
 }
 
 .recieved span {
