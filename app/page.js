@@ -191,7 +191,7 @@ export default function Home() {
                   <li onClick={() => setFocusedRoom(room)} key={index} className="relative cursor-pointer">
                     <h4 className="font-bold">{room.name}</h4>
                     <p className="text-gray-300">{room.description}</p>
-                    <span className="absolute right-0 top-3 bg-[#112d4e] py-1 px-2.5 rounded-full text-sm">2</span>
+                    <span className="absolute right-0 top-3 bg-[#112d4e] py-1 px-2.5 rounded-full text-sm">1</span>
                   </li>
                 ))}
               </ul>
