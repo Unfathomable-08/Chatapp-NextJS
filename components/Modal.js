@@ -41,7 +41,7 @@ const Modal = ({ onClose }) => {
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-[#00000022] z-20">
+    <div className="fixed inset-0 flex items-center justify-center bg-[#00000022] z-20 mx-8">
       <div className="bg-[#fefefe] p-8 rounded-2xl shadow-[0_0_20px_black] w-[500px]">
         <h1 className="text-2xl font-semibold mb-6 text-center">Create Room</h1>
         <form onSubmit={handleSubmit(submitFn)}>
