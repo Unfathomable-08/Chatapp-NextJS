@@ -214,9 +214,16 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col gap-y-3 px-4 py-22">
                   {
-                    allMsgs.map((msg, index)=>
-                      <p key={index} className={msg.user === userData.username ? "sent" : "recieved"}><span>{ msg.message }</span></p>
-                    )
+                    allMsgs.map((msg, index) => {
+                      return (
+                        <div key={index}>
+                          <p className={msg.user === userData.username ? "sent" : "recieved"}>
+                            <span>{msg.message}</span>
+                          </p>
+                          <p className="text-gray-600 text-sm">{msg.user}</p>
+                        </div>
+                      );
+                    })
                   }
                 </div>
               </div>
