@@ -29,3 +29,25 @@
 .rooms::-webkit-scrollbar {
   display: none;
 }
+
+.message {
+  width: calc(100vw - 64px);
+}
+
+@media (min-width: 640px) {
+  .message {
+    width: calc(100vw - 240px - 64px);
+  }
+}
+
+@media (min-width: 768px) {
+  .message {
+    width: calc(100vw - 240px - 128px);
+  }
+}
+  
+@media (min-width: 1024px) {
+  .message {
+    width: calc(100vw - 128px - 320px);
+  }
+}

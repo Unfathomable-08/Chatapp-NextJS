@@ -9,6 +9,7 @@ import { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp, onSnapshot, query, orderBy } from "firebase/firestore";
+import SearchModal from "@/components/RoomModel";
 
 export default function Home() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function Home() {
   const [rooms, setRooms] = useState([]);
   const [focusedRoom, setFocusedRoom] = useState();
   const [search, setSearch] = useState("");
+  const [searchModal, setSearchModal] = useState(false);
   const [message, setMessage] = useState("");
   const [allMsgs, setAllMsgs] = useState([]);
   const searchRef = useRef(null);
@@ -53,9 +55,12 @@ export default function Home() {
     };
     fetchFn();
 
-    // Bottom Of Chat
-    window.scrollTo(0, document.body.scrollHeight);
   }, []);
+  
+  // Bottom Of Chat
+  useEffect(()=>{
+    window.scrollTo(0, document.body.scrollHeight);
+  },[allMsgs])
 
   // Fetching Rooms
   useEffect(() => {
@@ -78,7 +83,7 @@ export default function Home() {
     };
 
     fetchRooms();
-  }, [userData, showModal]);
+  }, [userData, showModal, searchModal]);
 
   // Fetching Messages
   useEffect(()=>{
@@ -113,8 +118,8 @@ export default function Home() {
       const fetchFn = async () => {
         const res = await axios.get(`api/search?search=${search}`);
         if (res.status === 200) {
-          alert("room exist");
-          console.log(res)
+          console.log(res);
+          setSearchModal(true);
         }
       }
       fetchFn();
@@ -166,15 +171,15 @@ export default function Home() {
   return (
     <>
       <div className="flex">
-        <div className="sidebar-settings bg-[#0e0f11] h-screen fixed w-16 z-10 flex flex-col items-center py-10 gap-y-12">
+        <div className="sidebar-settings bg-[#0e0f11] h-screen fixed w-16 z-10 flex flex-col items-center py-10 gap-y-12 max-md:hidden">
           <i className="fa-solid fa-comment-dots text-2xl  text-gray-50"></i>
           <i className="fa-solid fa-user text-2xl text-gray-500"></i>
           <i className="fa-solid fa-gear text-2xl text-gray-500"></i>
           <i onClick={logout} className="fa-solid fa-right-from-bracket text-2xl text-gray-500 mt-auto"></i>
         </div>
   
-        <div className="ps-16 w-full">
-          <div className="bg-[#3f5370] h-screen w-80 fixed left-16 py-10 px-4 text-white overflow-y-auto rooms">
+        <div className="md:ps-16 w-full">
+          <div className="bg-[#3f5370] h-screen w-60 lg:w-80 fixed md:left-16 py-10 px-4 text-white overflow-y-auto rooms max-sm:hidden">
             <div className="grid grid-cols-[9fr_1fr] justify-center items-center gap-x-4 gap-y-1">
               <input type="search" placeholder="Search Room ..." ref={searchRef} onChange={(e)=>setSearch(e.target.value)} className="bg-[#eee] rounded-3xl w-full px-6 py-[3px] focus:outline-none focus:border-black focus:border-1 text-black placeholder-black placeholder:font-dark border-1 border-white" />
               <button onClick={searchRoom} className="text-4xl font-light transform -translate-[5px] cursor-pointer">+</button>
@@ -195,7 +200,7 @@ export default function Home() {
   
           {/* Conditional Rendering of Chat Panel */}
           {focusedRoom ? (
-            <div className="bg-[#eeeeee] min-h-screen relative px-8 pb-8 ml-80">
+            <div className="bg-[#eeeeee] min-h-screen relative px-8 pb-8 sm:ml-60 lg:ml-80">
               <div>
                 <div className="flex items-center gap-x-6 pt-6 fixed bg-[#eeeeee] w-full">
                   <div className="bg-black w-[45px] h-[45px] rounded-full p-2">
@@ -207,11 +212,6 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-y-3 px-4 py-22">
-                  <p className="recieved"><span>user 1 Message</span></p>
-                  <p className="recieved"><span>i dont know</span></p>
-                  <p className="sent"><span>you dont know too</span></p>
-                  <p className="sent"><span>you dont know too</span></p>
-                  <p className="recieved"><span>user 1 Message</span></p>
                   {
                     allMsgs.map((msg, index)=>
                       <p key={index} className={msg.user === userData.username ? "sent" : "recieved"}><span>{ msg.message }</span></p>
@@ -219,7 +219,7 @@ export default function Home() {
                   }
                 </div>
               </div>
-              <form style={{ width: "calc(100vw - 128px - 320px)" }} className="fixed bottom-0 bg-[#eeeeee] pb-8 pt-4" onSubmit={(e) => {sentMessage(e)}}
+              <form className="message fixed bottom-0 bg-[#eeeeee] pb-8 pt-4" onSubmit={(e) => {sentMessage(e)}}
             >
                 <input ref={messageRef} onChange={(e)=>{setMessage(e.target.value)}} type="text" placeholder="Message" className="w-full border border-gray-600 px-8 py-2 rounded-3xl" />
                 <button type="submit">
@@ -240,6 +240,7 @@ export default function Home() {
   
       {/* Modal Component */}
       {showModal && <Modal onClose={createRoom} />}
+      {searchModal && <SearchModal onClose={setSearchModal} room={search} />}
     </>
   );  
 }

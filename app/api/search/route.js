@@ -20,7 +20,7 @@ export async function GET(req) {
             return Response.json({message: "Room with this name doesn't exist!"}, {status: 404})
         };
 
-        return Response.json({message: "Room exists", data: rooms[0]}, {status: 200});
+        return Response.json({message: "Room exists"}, {status: 200});
 
     } catch (error) {
         return Response.json({message: error.message}, {status: 500});
