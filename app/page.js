@@ -216,7 +216,7 @@ export default function Home() {
                   {
                     allMsgs.map((msg, index) => {
                       return (
-                        <div key={index}>
+                        <div key={index} className={`flex flex-col ${msg.user === userData.username ? "items-end" : "items-start}`}>
                           <p className={msg.user === userData.username ? "sent" : "recieved"}>
                             <span>{msg.message}</span>
                           </p>
